@@ -13,6 +13,6 @@ GOOGLE_CLIENT_SECRETS_FILE=client_secrets.json
 ```
 3. Drag the `client_secrets.json` file (downloaded from the google cloud console or given to you) into this directory/folder.
 4. Run the script:
-```python
+```
 python youtube_v3_video_uploader.py
 ```

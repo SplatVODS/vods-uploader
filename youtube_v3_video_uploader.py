@@ -7,7 +7,6 @@ from os import getenv
 from dotenv import load_dotenv
 import os
 
-
 load_dotenv()
 SERVICE = 'youtube'
 SERVICE_VERSION = 'v3'
@@ -25,8 +24,6 @@ def get_authenticated_service():
 
 
 def upload_video(file_path, title, description, privacy_status, tags=None):
-    # ADD LOGIC TO APPEND TAGS INTO A LIST GOES HERE
-    # IT WILL BE A COMMA SEPARATED INPUT, MAKE SURE TO TAKE OUT EXTRA WHITE SPACE
     try:
         youtube = get_authenticated_service()
         body = {
@@ -34,7 +31,7 @@ def upload_video(file_path, title, description, privacy_status, tags=None):
                 "title": title,
                 "description": description,
                 "tags": tags or [],
-                "categoryId": "20",  # gaming, https://mixedanalytics.com/blog/list-of-youtube-video-category-ids/
+                "categoryId": "20",  # Gaming
             },
             "status": {
                 "privacyStatus": privacy_status
@@ -53,14 +50,23 @@ def upload_video(file_path, title, description, privacy_status, tags=None):
             status, response = request.next_chunk()
             if status:
                 print(f"Uploading... {int(status.progress() * 100)}%")
-        print(f"Uploading... 100%")
+        print("Uploading... 100%")
 
         messagebox.showinfo("Success", f"Upload Complete! Video ID: {response['id']}")
+        return {
+            "video_id": response["id"],
+            "title": title,
+            "player": description,
+            "social_link": "",
+            "tags": tags or [],
+            "url": "/" + os.path.basename(file_path)
+        }
+
     except Exception as e:
         messagebox.showerror("Upload Failed", str(e))
+        return None
 
 
-# GUI Setup
 def open_gui():
     def browse_file():
         selected = filedialog.askopenfilename(filetypes=[("MP4 files", "*.mp4"), ("All files", "*.*")])
@@ -80,7 +86,27 @@ def open_gui():
             messagebox.showwarning("Missing Info", "Please select a file and enter a title.")
             return
 
-        upload_video(path, title_val, desc_val, privacy_val, tags=tags_val)
+        result = upload_video(path, title_val, desc_val, privacy_val, tags=tags_val)
+        if result:
+            result_str = (
+                "{\n"
+                f'      video_id: "{result["video_id"]}",\n'
+                f'      title: "{result["title"]}",\n'
+                f'      player: "{result["player"]}",\n'
+                f'      social_link: "{result["social_link"]}",\n'
+                f'      tags: {result["tags"]},\n'
+                f'      url: "{result["url"]}"\n'
+                "},"
+            )
+
+            # Display in popup
+            top = tk.Toplevel()
+            top.title("Video Object JSON")
+            text = tk.Text(top, wrap="word", width=80, height=10)
+            text.insert(tk.END, result_str)
+            text.config(state="normal")
+            text.pack(padx=10, pady=10)
+            tk.Button(top, text="Copy to Clipboard", command=lambda: root.clipboard_append(result_str)).pack(pady=(0,10))
 
     root = tk.Tk()
     root.title("YouTube Video Uploader")
@@ -89,7 +115,7 @@ def open_gui():
     def on_closing():
         root.destroy()
 
-    root.protocol("WM_DELETE_WINDOW", on_closing) 
+    root.protocol("WM_DELETE_WINDOW", on_closing)
 
     # Title
     tk.Label(root, text="Title").grid(row=0, column=0, sticky="e", pady=2)
@@ -102,7 +128,7 @@ def open_gui():
     description.grid(row=1, column=1, pady=2)
 
     # Tags
-    tk.Label(root, text="Tags").grid(row=2, column=0, sticky="ne", pady=2)
+    tk.Label(root, text="Tags (comma-separated)").grid(row=2, column=0, sticky="ne", pady=2)
     tags = tk.Text(root, width=50, height=2)
     tags.grid(row=2, column=1, pady=2)
 

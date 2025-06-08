@@ -19,7 +19,7 @@ def get_authenticated_service():
         CLIENT_SECRETS_FILE,
         SCOPES
     )
-    credentials = flow.run_local_server(port=800)
+    credentials = flow.run_local_server(port=0)
     return build(SERVICE, SERVICE_VERSION, credentials=credentials)
 
 
@@ -46,13 +46,17 @@ def upload_video(file_path, title, description, privacy_status, tags=None):
         )
 
         response = None
+        chunks_used = 0
+
         while response is None:
             status, response = request.next_chunk()
-            if status:
-                print(f"Uploading... {int(status.progress() * 100)}%")
-        print("Uploading... 100%")
+            chunks_used += 1
 
-        messagebox.showinfo("Success", f"Upload Complete! Video ID: {response['id']}")
+            if status:
+                print(f"Using Chunk: {chunks_used} -> Uploading... {int(status.progress() * 100)}%")
+        print(f"Upload 100% Complete! Used: {chunks_used} chunks.")
+        messagebox.showinfo("Success", f"Upload 100% Complete! Used: {chunks_used} chunks. Video ID: {response['id']}")
+
         return {
             "video_id": response["id"],
             "title": title,

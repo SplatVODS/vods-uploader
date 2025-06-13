@@ -3,14 +3,13 @@ from tkinter import filedialog, messagebox
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 import google_auth_oauthlib.flow
-from os import getenv
 from dotenv import load_dotenv
 
 load_dotenv()
 SERVICE = 'youtube'
 SERVICE_VERSION = 'v3'
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
-CLIENT_SECRETS_FILE = getenv('GOOGLE_CLIENT_SECRETS_FILE')
+CLIENT_SECRETS_FILE = os.getenv('GOOGLE_CLIENT_SECRETS_FILE')
 
 # ADD Token Caching
 # USE from_client_config instead of from_client_secrets_file for public deployment. Then provide a json format with client ID

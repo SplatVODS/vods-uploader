@@ -5,7 +5,6 @@ from googleapiclient.http import MediaFileUpload
 import google_auth_oauthlib.flow
 from os import getenv
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 SERVICE = 'youtube'
@@ -13,7 +12,8 @@ SERVICE_VERSION = 'v3'
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 CLIENT_SECRETS_FILE = getenv('GOOGLE_CLIENT_SECRETS_FILE')
 
-
+# ADD Token Caching
+# USE from_client_config instead of from_client_secrets_file for public deployment. Then provide a json format with client ID
 def get_authenticated_service():
     flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
         CLIENT_SECRETS_FILE,

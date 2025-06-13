@@ -3,7 +3,6 @@ from tkinter import filedialog, messagebox
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 import google_auth_oauthlib.flow
-from os import getenv
 from dotenv import load_dotenv
 import os
 
@@ -11,7 +10,7 @@ load_dotenv()
 SERVICE = 'youtube'
 SERVICE_VERSION = 'v3'
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
-CLIENT_SECRETS_FILE = getenv('GOOGLE_CLIENT_SECRETS_FILE')
+CLIENT_SECRETS_FILE = os.getenv('GOOGLE_CLIENT_SECRETS_FILE')
 
 
 def get_authenticated_service():
